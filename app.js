@@ -15,7 +15,9 @@ const paymentRouter = require("./routes/payment.route");
 const clientRouter = require("./routes/client.route");
 const cartRouter = require("./routes/cart.route");
 const app = express();
+const axios = require("axios");
 app.use(express.json());
+
 app.use(cors({
   origin: process.env.USER_URL,
   credentials: true
@@ -23,6 +25,14 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 dbConnection();
+
+if (process.env.NODE_ENV === 'production') {
+  setInterval(() => {
+    axios.get('https://e6-project-ecommerce-backend.onrender.com//ping')
+      .then(() => console.log('Keep-alive ping sent!' , Date.now()))
+      .catch((err) => console.log('Ping failed:', err.message));
+  }, 300000);
+}
 app.use('/products', express.static('public/products'));
 app.use("/api/category", categoryRouter);
 app.use("/api/customer", createRouter);
