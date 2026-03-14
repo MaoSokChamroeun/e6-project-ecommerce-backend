@@ -1,6 +1,6 @@
 const Order = require("../model/order.model");
 const Product = require("../model/product.model");
-// CREATE ORDER
+
 // const createOrder = async (req, res) => {
 //   try {
 //     const { items } = req.body;
@@ -28,7 +28,7 @@ const Product = require("../model/product.model");
 //     }
 
 //     const order = await Order.create({
-//       user: req.user?._id,
+//       user: req.client._id, // FIXED
 //       items,
 //       totalAmount,
 //     });
@@ -48,6 +48,7 @@ const Product = require("../model/product.model");
 // };
 const createOrder = async (req, res) => {
   try {
+
     const { items } = req.body;
 
     if (!items || items.length === 0) {
@@ -60,6 +61,7 @@ const createOrder = async (req, res) => {
     let totalAmount = 0;
 
     for (const item of items) {
+
       const product = await Product.findById(item.product);
 
       if (!product) {
@@ -70,13 +72,14 @@ const createOrder = async (req, res) => {
       }
 
       totalAmount += product.price * item.quantity;
+
     }
 
-    const order = await Order.create({
-      user: req.client._id, // FIXED
-      items,
-      totalAmount,
-    });
+   const order = await Order.create({
+  user: req.client?._id || null,
+  items,
+  totalAmount,
+});
 
     res.status(201).json({
       success: true,
@@ -85,20 +88,70 @@ const createOrder = async (req, res) => {
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
+// const getOrders = async (req, res) => {
+//   try {
+
+//     const orders = await Order.find({ user: req.client._id })
+//       .populate("items.product", "name price image")
+//       .populate("user" , "username")
+//       .sort({ createdAt: -1 });
+
+//     res.status(200).json({
+//       success: true,
+//       data: orders
+//     });
+
+//   } catch (error) {
+
+//     res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+
+//   }
+// };
+
+
+// GET SINGLE ORDER
 
 const getOrders = async (req, res) => {
   try {
 
     const orders = await Order.find({ user: req.client._id })
       .populate("items.product", "name price image")
-      .populate("user" , "username")
+      .populate("user", "username email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+const getAllOrders = async (req, res) => {
+  try {
+
+    const orders = await Order.find()
+      .populate("user", "username email")
+      .populate("items.product", "name price image")
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -115,9 +168,6 @@ const getOrders = async (req, res) => {
 
   }
 };
-
-
-// GET SINGLE ORDER
 const getOrderById = async (req, res) => {
   try {
     const id = req.params.id;
@@ -294,5 +344,6 @@ module.exports = {
   updateOrderStatus,
   deleteOrder,
   fakePayment,
-  getOrderCount
+  getOrderCount,
+  getAllOrders
 };

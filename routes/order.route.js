@@ -1,4 +1,59 @@
+// const express = require("express");
+// const {
+//   createOrder,
+//   getOrders,
+//   getOrderById,
+//   updateOrderStatus,
+//   deleteOrder,
+//   fakePayment,
+//   getOrderCount,
+//   getAllOrders
+// } = require("../controller/order.controller");
+// const { protect } = require("../middleware/auth.middleware");
+// const { restricGuard } = require("../guard/restric.guard");
+// const { clientProtect } = require("../middleware/client.middleware");
+
+// const orderRouter = express.Router();
+
+// orderRouter
+//   .route("/")
+//   .post(createOrder)
+//   .get(protect, restricGuard("admin"), getOrders);  
+
+// orderRouter
+//   .route("/client/orders")
+//   .get(clientProtect, getOrders)
+//   .post(clientProtect, createOrder);
+
+// orderRouter.route("/count").get(getOrderCount);
+
+// orderRouter
+//   .route("/:id")
+//   .get(protect, restricGuard("admin"), getOrderById)
+//   .put(protect, restricGuard("admin"), updateOrderStatus)
+//   .delete(protect, restricGuard("admin"), deleteOrder);
+
+// orderRouter
+//   .route("/client/public/:id")
+//   .get(clientProtect, getOrderById)
+//   .put(clientProtect, updateOrderStatus)
+//   .delete(clientProtect, deleteOrder);
+
+// orderRouter.post("/pay", fakePayment);
+
+// module.exports = orderRouter;
+
+
+
+
+
+
+
+
+
+
 const express = require("express");
+
 const {
   createOrder,
   getOrders,
@@ -7,37 +62,51 @@ const {
   deleteOrder,
   fakePayment,
   getOrderCount,
+  getAllOrders
 } = require("../controller/order.controller");
+
 const { protect } = require("../middleware/auth.middleware");
 const { restricGuard } = require("../guard/restric.guard");
-const { clientProtect } = require("../middleware/client.middleware");
+const { clientProtect } = require('../middleware/client.middleware');
 
 const orderRouter = express.Router();
 
-orderRouter
-  .route("/")
-  .post(createOrder)
-  .get(protect, restricGuard("admin"), getOrders);
 
-orderRouter
-  .route("/client/orders")
-  .get(clientProtect, getOrders)
-  .post(clientProtect, createOrder);
+// CLIENT ROUTES
+// ===============================
 
-orderRouter.route("/count").get(getOrderCount);
+// Create order
+orderRouter.post("/create", clientProtect, createOrder);
 
-orderRouter
-  .route("/:id")
-  .get(protect, restricGuard("admin"), getOrderById)
-  .put(protect, restricGuard("admin"), updateOrderStatus)
-  .delete(protect, restricGuard("admin"), deleteOrder);
+// Client orders
+orderRouter.get("/client/orders", clientProtect, getOrders);
 
-orderRouter
-  .route("/client/public/:id")
-  .get(clientProtect, getOrderById)
-  .put(clientProtect, updateOrderStatus)
-  .delete(clientProtect, deleteOrder);
+// Client single order
+orderRouter.get("/client/:id", clientProtect, getOrderById);
 
-orderRouter.post("/pay", fakePayment);
+// Payment
+orderRouter.post("/pay", clientProtect, fakePayment);
+
+
+
+// ADMIN ROUTES
+// ===============================
+
+// Get all orders
+orderRouter.get("/", protect, restricGuard("admin"), getAllOrders);
+
+// Order count for dashboard
+orderRouter.get("/count", protect, restricGuard("admin"), getOrderCount);
+
+// Single order
+orderRouter.get("/:id", protect, restricGuard("admin"), getOrderById);
+
+// Update order
+orderRouter.put("/:id", protect, restricGuard("admin"), updateOrderStatus);
+
+// Delete order
+orderRouter.delete("/:id", protect, restricGuard("admin"), deleteOrder);
+
+
 
 module.exports = orderRouter;
