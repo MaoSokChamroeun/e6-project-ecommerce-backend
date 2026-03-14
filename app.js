@@ -19,8 +19,10 @@ const axios = require("axios");
 app.use(express.json());
 
 app.use(cors({
-  origin: process.env.USER_URL,
-  credentials: true
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
