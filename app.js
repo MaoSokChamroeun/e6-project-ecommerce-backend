@@ -30,7 +30,7 @@ dbConnection();
 
 if (process.env.NODE_ENV === 'production') {
   setInterval(() => {
-    axios.get('https://e6-project-ecommerce-backend.onrender.com//ping')
+    axios.get('https://e6-project-ecommerce-backend.onrender.com/ping')
       .then(() => console.log('Keep-alive ping sent!' , Date.now()))
       .catch((err) => console.log('Ping failed:', err.message));
   }, 300000);
