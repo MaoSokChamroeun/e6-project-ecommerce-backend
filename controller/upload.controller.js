@@ -30,7 +30,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Multer config
 const upload = multer({
   storage,
   fileFilter,
@@ -38,8 +37,6 @@ const upload = multer({
     fileSize: 1024 * 1024 * 5, // 5MB per image
   },
 });
-
-// Upload middleware (MAX 5 IMAGES)
 const uploadProductFile = (req, res, next) => {
   upload.array("image", 5)(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -60,6 +57,37 @@ const uploadProductFile = (req, res, next) => {
   });
 };
 
+// Banner storage (separate from product)
+const bannerStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "banners",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1200, height: 600, crop: "limit" }],
+  },
+});
+
+const uploadBanner = multer({
+  storage: bannerStorage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5, // optional
+  },
+});
+const uploadBannerFile = (req, res, next) => {
+  uploadBanner.single("image")(req, res, (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Please select an image" });
+    }
+
+    next();
+  });
+};
+
+
 module.exports = {
   uploadProductFile,
+  uploadBannerFile
 };

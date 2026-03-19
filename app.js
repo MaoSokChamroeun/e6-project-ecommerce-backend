@@ -17,6 +17,7 @@ const cartRouter = require("./routes/cart.route");
 const app = express();
 const axios = require("axios");
 const favoriteRouter = require("./routes/favorite.route");
+const bannerRouter = require("./routes/banner.route");
 app.use(express.json());
 
 app.use(cors({
@@ -47,7 +48,7 @@ app.use("/api/inventory" , inventoryRouter )
 app.use("/api/payment" , paymentRouter)
 app.use("/api/favorite" , favoriteRouter)
 app.use("/api/user/cart" , cartRouter)
-
+app.use("/api/banner" , bannerRouter)
 //user usign app
 
 app.use("/api/user/client" , clientRouter)
